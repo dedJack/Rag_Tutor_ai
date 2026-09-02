@@ -2,3 +2,4 @@ videos/*
 audios/*
 jsons/*
 unused/*
+*.csv
