@@ -2,6 +2,8 @@ import requests
 import os
 import json
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 def create_chunks(text):
     response = requests.post("http://localhost:11434/api/embed",json={
@@ -22,7 +24,7 @@ jsons = os.listdir("jsons")
 my_dicts = []
 chunk_id = 1
 for json_file in jsons:
-
+    print(F"FILENAME:-{json_file}")
     with open(f"jsons/{json_file}") as f:
         content = json.load(f)
 
@@ -45,10 +47,27 @@ for json_file in jsons:
 
         chunk_id += 1
         my_dicts.append(chunk)
-
+        if(i==5):
+            break
     print(f"Completed: {json_file}")
+    break
+
 
 # print(my_dicts)
 df = pd.DataFrame.from_records(my_dicts)
-df.to_csv("embeddings.csv", index=False)
+
+input_query = input("Ask a question for RAG = ")     #input query
+question_embedding = create_chunks([input_query])[0]       # Creating embedding of input query
+
+# print(np.vstack(df['embedding']).shape) #np.vstack allign the dimension vertically
+
+similarities = cosine_similarity(np.vstack(df['embedding']),[question_embedding]).flatten()   #Finding cosine similarity between chunks
+new_index = similarities.argsort()[::-1][0:3]
+# print(similarities)
+# print(similarities.argsort()[::-1][0:3])
+
+new_df = df.loc[new_index]
+print(new_df['text'])
+# df.to_csv("embeddings.csv", index=False)
 # print(df)
+
