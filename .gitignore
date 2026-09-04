@@ -1,5 +1,7 @@
+__pycache__/*
 videos/*
 audios/*
 jsons/*
 unused/*
 *.csv
+*.joblib
