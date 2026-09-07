@@ -48,16 +48,14 @@ for json_file in jsons:
 
         chunk_id += 1
         my_dicts.append(chunk)
-        if(i==5):
-            break
-    print(f"Completed: {json_file}")
-    break
+        
 
 
 # print(my_dicts)
 df = pd.DataFrame.from_records(my_dicts)
 
 joblib.dump(df,"embeddings.joblib")
+print("All embeddings are done👍")
 # df.to_csv("embeddings.csv", index=False)
 # print(df)
 
