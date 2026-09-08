@@ -5,7 +5,12 @@ import pandas as pd
 import joblib
 import numpy as np
 import requests
+from openai import OpenAI
+import config
 
+client = OpenAI(api_key=config.OPENAI_API_KEY)
+
+# Local model to generate embeddings of chunks
 def create_chunks(text):
     response = requests.post("http://localhost:11434/api/embed",json={ 
         "model":'bge-m3',
@@ -20,6 +25,7 @@ def create_chunks(text):
     embedding = response.json()['embeddings']
     return embedding;
 
+# Local model for LLM from Ollama
 def streamResponse(prompt):
     response = requests.post("http://localhost:11434/api/generate",json={ 
         "model":'llama3.2',
@@ -36,12 +42,21 @@ def streamResponse(prompt):
     # print(result)
     return result;
 
+# OpenAi api model GPT-5
+def streamResponseOpenAi(prompt):
+    response = client.responses.create(
+        model="gpt-5",
+        input=prompt,
+    )
+
+    return response.output_text
+
 df = joblib.load("embeddings.joblib")
 input_query = input("Ask a question for RAG = ")     #input query
 question_embedding = create_chunks([input_query])[0]       # Creating embedding of input query
 
 # print(np.vstack(df['embedding']).shape) #np.vstack allign the dimension vertically
-top_result=30
+top_result=40
 similarities = cosine_similarity(np.vstack(df['embedding']),[question_embedding]).flatten()   #Finding cosine similarity between chunks
 new_index = similarities.argsort()[::-1][0:top_result]
 # print(similarities)
@@ -66,12 +81,9 @@ Instructions:
 - Give a clear and concise answer.
 """
 
-response = streamResponse(prompt)
-r = response['response']
-print(r)
-with open("response.json","w") as f:
-    json.dump(r, f)
-
-# print(prompt)
-# for index, item in new_df.iterrows():
-#     print(index , item['video_no'],item['title'], item['text'], item['start'],item['end'])
+# response = streamResponse(prompt) # Local model
+response = streamResponseOpenAi(prompt) #openai model
+print(response)
+# r = response['response']
+with open("response.txt","w",encoding="utf-8") as f:
+    f.write(response)
