@@ -21,15 +21,15 @@ def create_chunks(text):
     return embedding
 
 
-jsons = os.listdir("jsons")
+jsons = os.listdir("merge_chunks")
 my_dicts = []
 chunk_id = 1
 for json_file in jsons:
     print(F"FILENAME:-{json_file}")
-    with open(f"jsons/{json_file}") as f:
-        content = json.load(f)
+    with open(os.path.join('merge_chunks',json_file),"r", encoding='utf-8') as file:
+        content = json.load(file)
 
-    texts = [chunk['text'] for chunk in content['chunk']]
+    texts = [chunk['text'] for chunk in content['chunks']]
 
     print(f"\nFile: {json_file}")
     print(f"Chunks: {len(texts)}")
@@ -42,13 +42,12 @@ for json_file in jsons:
         print("❌ Embedding failed")
         continue
 
-    for i, chunk in enumerate(content['chunk']):
+    for i, chunk in enumerate(content['chunks']):
         chunk['chunk_id'] = chunk_id
         chunk['embedding'] = embedding[i]
 
         chunk_id += 1
         my_dicts.append(chunk)
-        
 
 
 # print(my_dicts)

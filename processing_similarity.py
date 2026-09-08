@@ -56,7 +56,7 @@ input_query = input("Ask a question for RAG = ")     #input query
 question_embedding = create_chunks([input_query])[0]       # Creating embedding of input query
 
 # print(np.vstack(df['embedding']).shape) #np.vstack allign the dimension vertically
-top_result=40
+top_result=10
 similarities = cosine_similarity(np.vstack(df['embedding']),[question_embedding]).flatten()   #Finding cosine similarity between chunks
 new_index = similarities.argsort()[::-1][0:top_result]
 # print(similarities)

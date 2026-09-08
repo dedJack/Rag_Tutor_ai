@@ -1,9 +1,11 @@
 __pycache__/*
 videos/*
 audios/*
+merge_chunks/*
 jsons/*
 unused/*
 *.csv
 *.joblib
 .env
 config.py
+*.txt
